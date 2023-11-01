@@ -1,4 +1,33 @@
+# This code provides the functions to extract the time-lagged dataset
+# from WEPY simulation data, where merging and cloning has taken
+# place as a part of the enhanced sampling strategy.
+#
+# This is essential for running TICA or building the transition counts matrices.
+#
+# A time-lagged data has a starting point (t0) and an end-point (t1), which are
+# related by the formula t1 = t0 _ \del_T where \del_T is the lag-time.
+# 
+# As per weighted ensemble strategy, a trajectory can clone into multiple trahectories
+# with any given time-step of the simulation. Hence, there is a probability that the trajectory at t0 will split
+# into multiple trajectories within a given lag-time. Hence, for a given conformation (C0) at t0, 
+# instead of a single conformation (C1) at t1, we may end up with multiple conformations at t1 (C1, C1', C1" etc...).
+# So, the concept of straight-forward time-lagged dataset does not work with the WE based strategy.
+#
+# The solution:
+# Firstly, the time-lagged datapoints (C0 at t0 and C1, C1', C1"... at t1) can not have any weight imbalance, i.e.,
+# the weight of the root node (at t0) and the weight of it's time-lagged children (at t1) should be exactly same. 
+# Secondly, even if there is no weight-imbalance, still there may arise a particular scenario where we need to discard the
+# time-lagged datapoint from the dataset. Consider a case where a walker (weight=w) from a separate tree (no historical connection), 
+# merges into a node which connects the root node (at t0) with its time-lagged children (at t1). 
+# In general this would add-up weights by 'w' amount to the subtree of the root node under observation and hence such time-lagged
+# parent-children pair will be discarded straightaway. However, if we have a squashing event within the (t0 to t1) subtree as well
+# where the sqaushed walker had the exactly same weight ('w') before being squashed, then mathematically we don't observe the
+# difference in the weights of root node (t0) and its children (t1). Still such time-lagged parent-children pair are biased by out-of-tree
+# merging and must be discarded as well. 
 
+# These solutions are undertaken in the following functions and we get corrected time-lagged datapoints which 
+# are used to build the MSMs in our work.
+#
 
 import numpy as np
 from wepy.hdf5 import WepyHDF5
@@ -18,7 +47,7 @@ import time
 import sys
 import networkx as nx
 
-#
+
 def gen_all_trees(h5_path,run_idx):
     wepy_h5 =  WepyHDF5(h5_path, mode='r')
 
