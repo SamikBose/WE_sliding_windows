@@ -199,4 +199,6 @@ run_idx = sys.argv[1]
 window_length = sys.argv[2]
 t_end = time.time()
 
-accepted_sliding_windows = get_accepted_sw(h5_path, run_idx, window_length) 
+accepted_sliding_windows = get_accepted_sw(h5_path, run_idx, window_length)
+
+pkl.dump(accepted_sliding_windows,  open(f'tld_run{run_idx}_lagtime{window_length}.pkl','wb'))
