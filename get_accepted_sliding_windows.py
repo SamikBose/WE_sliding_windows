@@ -192,13 +192,14 @@ def get_accepted_sw(h5_path, run_idx, window_length):
     return(accepted_sw)
 
 
+for i in range(10):
+    t_start = time.time()
+    h5_path = '/dickson/s1/bosesami/KSL_unbinding/KSL_19/simulation_folder/openmm/clone.h5' 
+    tld_path = '/dickson/s1/bosesami/time_lagged_data_WE/tl_datasets'
+    run_idx = i
+    window_length = int(sys.argv[1])
+    t_end = time.time()
 
-t_start = time.time()
-h5_path = '/dickson/s1/bosesami/KSL_unbinding/KSL_19/simulation_folder/openmm/clone.h5' 
-run_idx = sys.argv[1]
-window_length = sys.argv[2]
-t_end = time.time()
+    accepted_sliding_windows = get_accepted_sw(h5_path, run_idx, window_length)
 
-accepted_sliding_windows = get_accepted_sw(h5_path, run_idx, window_length)
-
-pkl.dump(accepted_sliding_windows,  open(f'tld_run{run_idx}_lagtime{window_length}.pkl','wb'))
+    pkl.dump(accepted_sliding_windows,  open(f'{tld_path}/tld_run{run_idx}_lagtime{window_length}.pkl','wb'))
