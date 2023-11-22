@@ -45,7 +45,7 @@ import numpy as np
 import time
 import sys
 import networkx as nx
-
+import ipdb
 
 ## This function generates all the walker trees and the resampling panel of a run
 def gen_all_trees(h5_path,run_idx):
@@ -144,19 +144,20 @@ def check_out_of_tree_merge(all_node_dict, merging_dict, dict_walkers_each_cycle
         child_cycle, child_walker = keys[0], keys[1]  # left hand side of the all_node_dict
         #parent_cycle, parent_walker = all_node_dict[keys][0][0], all_node_dict[keys][0][1] # RHS
 
+        #ipdb.set_trace()
         if child_walker in merging_dict[child_cycle].keys(): #if the child is present
             #This was an old logic: Wrong
             #if parent_walker not in merging_dict[child_cycle][child_walker]: # and its parent is absent
 
             ####node has to be in the child_dict in this cycle
             ####check merging_dict[child_cycle][keys] are in the all_node_dict.walkers in the same cycle
-            merged_nodes = merging_dict[child_cycle][keys]
+            merged_nodes = merging_dict[child_cycle][child_walker]
             for node in merged_nodes:
                 if node not in dict_walkers_each_cycle[child_cycle]:
                     SIGNAL = False
                     break
 
-        if SIGNAL = False:
+        if SIGNAL == False:
             break
     return(SIGNAL)
 
@@ -191,6 +192,8 @@ def get_accepted_sw(h5_path, run_idx, window_length, wt_path, n_cycs, n_walkers 
 
         final_cycle_in_subtree =  sorted_node_list[index][-1][0]
 
+        for each_sorted_node in sorted_node_list[index]:
+
             current_cycle =  each_sorted_node[0]
             if current_cycle <= final_cycle_in_subtree - window_length:
                 signal, init_wt, final_wt, all_node_dict, tl_nodes_list = match_weights(eff_subtrees_list[index], each_sorted_node, window_length, run_idx, all_wts)
@@ -198,13 +201,13 @@ def get_accepted_sw(h5_path, run_idx, window_length, wt_path, n_cycs, n_walkers 
                     dict_walkers_each_cycle = listed_walker_dict(all_node_dict, window_length, current_cycle)
                     signal_merging = check_out_of_tree_merge(all_node_dict, merging_dict, dict_walkers_each_cycle)
 
-                   if signal_merging == True:
+                    if signal_merging == True:
                         true_count += 1
 
                         for tl_node in tl_nodes_list:
                             accepted_sw.append([(each_sorted_node[1], each_sorted_node[0]), (tl_node[1],tl_node[0])])
 
-                   else:
+                    else:
                         #print(f'Blacklisted node encountered in the subtree... Root node {each_sorted_node}')
                         false_count_merging += 1
                 else:
@@ -221,14 +224,15 @@ t_start = time.time()
 
 run_idx = int(sys.argv[1])
 window_length = int(sys.argv[2])
-n_cycs = 100000
-n_walkers = 100
+n_cycs = 5000
+n_walkers = 48
 dummy_run_idx = 0
 h5_path = f'/dickson/s1/bosesami/time_lagged_data_WE/randomwalk_sims/1D_15states_{n_cycs}cycles_{n_walkers}walkers_RUN{run_idx}/wepy.results.h5' 
-wt_path = f'/dickson/s1/bosesami/time_lagged_data_WE/randomwalk_sims/all_wts_run{run_idx}.pkl'
+wt_path = f'/dickson/s1/bosesami/time_lagged_data_WE/randomwalk_sims/all_wts/all_wts_1D_15states_{n_cycs}cycles_{n_walkers}walkers_run{run_idx}.pkl'
+out_path = f'/dickson/s1/bosesami/time_lagged_data_WE/tld_5000_cyc/rw_tld_run{run_idx}_lagtime{window_length}.pkl'
 
 accepted_sliding_windows = get_accepted_sw(h5_path, dummy_run_idx, window_length, wt_path, n_cycs, n_walkers)
-pkl.dump(accepted_sliding_windows,  open(f'rw_tld_run{run_idx}_lagtime{window_length}_V2.pkl','wb'))
+pkl.dump(accepted_sliding_windows,  open(out_path,'wb'))
 
 t_end = time.time()
 print(f'Run idx: {run_idx}, length of accepted tld:{len(accepted_sliding_windows)}, time taken: {t_end - t_start}')
