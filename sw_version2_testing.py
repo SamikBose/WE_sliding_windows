@@ -188,7 +188,7 @@ def check_out_of_tree_merge(all_node_dict, merging_dict, dict_walkers_each_cycle
                 merged_nodes = merging_dict[child_cycle - 1][child_walker]
                 for node in merged_nodes:
                     if node not in dict_walkers_each_cycle[child_cycle]:
-                        print(f'all_node_dict {all_node_dict}, Cycle:{child_cycle}, keep_merge_walker: {child_walker}, out of tree walker {node}...')
+                        print(f'Root node: {keys}, Cycle:{child_cycle}, keep_merge_walker: {child_walker}, out of tree walker {node}...')
                         SIGNAL = False
 
                         ## testing purpose: commenting out all the for-loop break commands 
