@@ -236,7 +236,7 @@ n_walkers = int(sys.argv[4])
 dummy_run_idx = 0
 h5_path = f'/dickson/s1/bosesami/time_lagged_data_WE/randomwalk_sims/1D_15states_{n_cycs}cycles_{n_walkers}walkers_RUN{run_idx}/wepy.results.h5' 
 wt_path = f'/dickson/s1/bosesami/time_lagged_data_WE/randomwalk_sims/all_wts/all_wts_1D_15states_{n_cycs}cycles_{n_walkers}walkers_run{run_idx}.pkl'
-out_path = f'/dickson/s1/bosesami/time_lagged_data_WE/tld_5000_cyc/rw_tld_run{run_idx}_lagtime{window_length}.pkl'
+out_path = f'/dickson/s1/bosesami/time_lagged_data_WE/tld_{n_cycs}_cyc/rw_tld_run{run_idx}_lagtime{window_length}.pkl'
 
 accepted_sliding_windows = get_accepted_sw(h5_path, dummy_run_idx, window_length, wt_path, n_cycs, n_walkers)
 pkl.dump(accepted_sliding_windows,  open(out_path,'wb'))
